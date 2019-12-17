@@ -28,12 +28,12 @@ func NewRunner() *Runner {
 }
 
 // Run initializes runner with given parameters.
-func (r *Runner) Run(p *Params) {
+func (r *Runner) Run(appConfig *AppConfig) {
 	for fileName := range r.start {
 
-		color.Green("Running %s...\n", p.Get("run"))
+		color.Green("Running %s...\n", appConfig.Watcher.Run)
 
-		cmd, err := runCommand(fileName, p.Package...)
+		cmd, err := runCommand(fileName, appConfig.Package.Args...)
 		if err != nil {
 			log.Printf("Could not run the go binary: %s \n", err)
 			r.kill(cmd)

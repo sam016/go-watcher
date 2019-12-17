@@ -21,22 +21,22 @@ func main() {
 		BuildTime: buildTime,
 	}
 
-	params := watcher.ParseArgs(os.Args, vinfo)
+	config := watcher.ParseArgs(os.Args, vinfo)
 
-	if params == nil {
+	if config == nil {
 		return
 	}
 
-	w := watcher.MustRegisterWatcher(params)
+	w := watcher.MustRegisterWatcher(config)
 
 	r := watcher.NewRunner()
 
-	// wait for build and run the binary with given params
-	go r.Run(params)
+	// wait for changes and run the binary with given config
+	go r.Run(config)
 	b := watcher.NewBuilder(w, r)
 
 	// build given package
-	go b.Build(params)
+	go b.Build(config)
 
 	// listen for further changes
 	go w.Watch()

@@ -15,7 +15,7 @@ import (
 	fsnotify "gopkg.in/fsnotify.v1"
 )
 
-// GoPath not set error
+// ErrPathNotSet GoPath not set error
 var ErrPathNotSet = errors.New("gopath not set")
 
 var watchedFileExt = []string{".go", ".tmpl", ".tpl", ".html"}
@@ -34,8 +34,8 @@ type Watcher struct {
 
 // MustRegisterWatcher creates a new Watcher and starts listening to
 // given folders
-func MustRegisterWatcher(params *Params) *Watcher {
-	watchVendorStr := params.Get("watch-vendor")
+func MustRegisterWatcher(appConfig *AppConfig) *Watcher {
+	watchVendorStr := appConfig.Watcher.WatchVendor
 	var watchVendor bool
 	var err error
 	if watchVendorStr != "" {
@@ -47,7 +47,7 @@ func MustRegisterWatcher(params *Params) *Watcher {
 
 	w := &Watcher{
 		update:      make(chan struct{}),
-		rootdir:     params.Get("watch"),
+		rootdir:     appConfig.Watcher.Watch,
 		watchVendor: watchVendor,
 	}
 

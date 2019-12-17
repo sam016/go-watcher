@@ -3,7 +3,7 @@ version: '2.1'
 services:
   hello:
     image: sam016/go-watcher:latest
-    command: watcher -run hello
+    command: watcher -f /go/src/hello/watcher.yml
     ports:
       - "7000:7000"
     environment:

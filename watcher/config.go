@@ -2,9 +2,16 @@ package watcher
 
 // AppConfig contains the argument information for delve, watcher and main package
 type AppConfig struct {
-	DelveArgs   map[string]string `yaml:delve`
-	PackageArgs map[string]string `yaml:package`
-	WatcherArgs map[string]string `yaml:watcher`
+	DelveArgs []string `yaml:"delve-args,omitempty"`
+	Package   struct {
+		Path string   `yaml:"path"`
+		Args []string `yaml:"args,omitempty"`
+	} `yaml:"package"`
+	Watcher struct {
+		Run         string `yaml:"run"`
+		Watch       string `yaml:"watch"`
+		WatchVendor string `yaml:"watch-vendor"`
+	} `yaml:"watcher,omitempty"`
 }
 
 // VersionInfo contains all the information regarding the version

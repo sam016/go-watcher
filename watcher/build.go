@@ -23,7 +23,7 @@ func NewBuilder(w *Watcher, r *Runner) *Builder {
 
 // Build listens watch events from Watcher and sends messages to Runner
 // when new changes are built.
-func (b *Builder) Build(p *Params) {
+func (b *Builder) Build(appConfig *AppConfig) {
 	go b.registerSignalHandler()
 	go func() {
 		// used for triggering the first build
@@ -31,9 +31,9 @@ func (b *Builder) Build(p *Params) {
 	}()
 
 	for range b.watcher.Wait() {
-		fileName := p.generateBinaryName()
+		fileName := appConfig.generateBinaryName()
 
-		pkg := p.packagePath()
+		pkg := appConfig.packagePath()
 
 		log.Println("build started")
 		color.Cyan("Building %s...\n", pkg)

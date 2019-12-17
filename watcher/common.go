@@ -3,48 +3,22 @@ package watcher
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"os"
 	"os/exec"
 	"strings"
 	"time"
+
+	"gopkg.in/yaml.v2"
 )
 
 // Binary name used for built package
 const binaryName = "watcher"
 
-var watcherFlags = []string{"run", "watch", "watch-vendor", "version"}
-
-// Params is used for keeping go-watcher and application flag parameters
-type Params struct {
-	// Package parameters
-	Package []string
-	// Go-Watcher parameters
-	Watcher map[string]string
-}
-
-// NewParams creates a new Params instance
-func NewParams() *Params {
-	return &Params{
-		Package: make([]string, 0),
-		Watcher: make(map[string]string),
-	}
-}
-
-// Get returns the watcher parameter with the given name
-func (p *Params) Get(name string) string {
-	return p.Watcher[name]
-}
-
-func (p *Params) cloneRunFlag() {
-	if p.Watcher["watch"] == "" && p.Watcher["run"] != "" {
-		p.Watcher["watch"] = p.Watcher["run"]
-	}
-}
-
-func (p *Params) packagePath() string {
-	run := p.Get("run")
+func (appConfig *AppConfig) packagePath() string {
+	run := appConfig.Watcher.Run
 	if run != "" {
 		return run
 	}
@@ -53,10 +27,10 @@ func (p *Params) packagePath() string {
 }
 
 // generateBinaryName generates a new binary name for each rebuild, for preventing any sorts of conflicts
-func (p *Params) generateBinaryName() string {
+func (appConfig *AppConfig) generateBinaryName() string {
 	rand.Seed(time.Now().UnixNano())
 	randName := rand.Int31n(999999)
-	packageName := strings.Replace(p.packagePath(), "/", "-", -1)
+	packageName := strings.Replace(appConfig.packagePath(), "/", "-", -1)
 
 	return fmt.Sprintf("%s-%s-%d", generateBinaryPrefix(), packageName, randName)
 }
@@ -68,6 +42,19 @@ func generateBinaryPrefix() string {
 	}
 
 	return path
+}
+
+func (appConfig *AppConfig) clean() bool {
+
+	if appConfig.Watcher.Run == "" {
+		log.Fatalln("Watchers `run` arg not set")
+	}
+
+	if appConfig.Watcher.Watch == "" {
+		log.Fatalln("Watchers `watch` arg not set")
+	}
+
+	return true
 }
 
 // runCommand runs the command with given name and arguments. It copies the
@@ -96,47 +83,52 @@ func runCommand(name string, args ...string) (*exec.Cmd, error) {
 
 // ParseArgs extracts the application parameters from args and returns
 // Params instance with separated watcher and application parameters
-func ParseArgs(args []string, vinfo VersionInfo) *Params {
+func ParseArgs(args []string, vinfo VersionInfo) *AppConfig {
 
-	params := NewParams()
+	var appConfig AppConfig
+
+	isConfigLoaded := false
 
 	// remove the command argument
 	args = args[1:len(args)]
 
 	for i := 0; i < len(args); i++ {
-		arg := args[i]
-		arg = stripDash(arg)
+		arg := stripDash(args[i])
 
-		if existIn(arg, watcherFlags) {
+		if arg == "version" {
+			fmt.Println("go-version=", vinfo.GoVersion)
+			fmt.Println("version=", vinfo.Version)
+			fmt.Println("commit=", vinfo.Commit)
+			fmt.Println("built-at=", vinfo.BuildTime)
+			return nil
+		}
 
-			if arg == "version" {
-				fmt.Println("go-version=", vinfo.GoVersion)
-				fmt.Println("version=", vinfo.Version)
-				fmt.Println("commit=", vinfo.Commit)
-				fmt.Println("built-at=", vinfo.BuildTime)
+		if arg == "f" {
+			configFileName := args[i+1]
+
+			yamlFile, err := ioutil.ReadFile(configFileName)
+			if err != nil {
+				fmt.Printf("Error reading YAML file: %s\n", err)
 				return nil
 			}
 
-			// used for fetching the value of the given parameter
-			if len(args) <= i+1 {
-				log.Fatalf("missing parameter value: %s", arg)
+			err = yaml.Unmarshal(yamlFile, &appConfig)
+			if err != nil {
+				fmt.Printf("Error parsing YAML file: %s\n", err)
+				return nil
 			}
 
-			if strings.HasPrefix(args[i+1], "-") {
-				log.Fatalf("missing parameter value: %s", arg)
-			}
+			fmt.Printf("%#v\n", appConfig)
 
-			params.Watcher[arg] = args[i+1]
-			i++
-			continue
+			isConfigLoaded = true
 		}
-
-		params.Package = append(params.Package, args[i])
 	}
 
-	params.cloneRunFlag()
+	if !isConfigLoaded || !appConfig.clean() {
+		return nil
+	}
 
-	return params
+	return &appConfig
 }
 
 // stripDash removes the both single and double dash chars and returns

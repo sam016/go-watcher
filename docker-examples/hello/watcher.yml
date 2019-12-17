@@ -1,16 +1,18 @@
-delve:
-  - headless
-  - continue
-  - accept-multiclient
-  - api-version: 2
-  - listen: :8084
-  - output: /tmp/__debug_bin
-  - log
-  - log-dest: debugger.log"
+delve-args:
+  - --headless
+  - --continue
+  - --accept-multiclient
+  - --api-version=2
+  - --listen=:8084
+  - --output=/tmp/__debug_bin
+  - --log
+  - --log-dest=debugger.log"
 watcher:
-  - run: hello
-  - watch: hello
+  run: hello
+  watch: hello
 package:
-  - argXYZ: some-value
-  - argABC: another-value
-  - argEMPTY
+  path: "/go/src/hello"
+  args:
+  - --argXYZ=some-value
+  - --argABC=another-value
+  - --argEMPTY
