@@ -118,8 +118,6 @@ func ParseArgs(args []string, vinfo VersionInfo) *AppConfig {
 				return nil
 			}
 
-			fmt.Printf("%#v\n", appConfig)
-
 			isConfigLoaded = true
 		}
 	}

@@ -11,7 +11,6 @@ watcher:
   run: hello
   watch: hello
 package:
-  path: "/go/src/hello"
   args:
   - --argXYZ=some-value
   - --argABC=another-value
