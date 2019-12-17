@@ -5,6 +5,9 @@ RUN go get -v github.com/fatih/color
 RUN go get -v gopkg.in/fsnotify.v1
 RUN go get -v golang.org/x/sys/...
 RUN go get -v gopkg.in/yaml.v2
+# RUN go get -v github.com/go-delve/delve/...
+# RUN go install github.com/go-delve/delve/cmd/dlv
+RUN go get -v github.com/go-delve/delve/cmd/dlv
 
 COPY . /go/src/github.com/sam016/go-watcher
 

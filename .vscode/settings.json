@@ -1,2 +1,4 @@
 {
+  "editor.rulers": [80,120],
+  "explorer.autoReveal": false
 }

@@ -6,6 +6,7 @@ services:
     command: watcher -f /go/src/hello/watcher.yml
     ports:
       - "7000:7000"
+      - "2345:2345"
     environment:
       - GO_VERSION=1.11
     volumes:

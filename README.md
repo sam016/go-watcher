@@ -5,6 +5,8 @@ Watcher is a command line tool inspired by [fresh](https://github.com/pilu/fresh
 
 Most of the existing file watchers have a configuration burden, and even though Go has a really short build time, this configuration burden makes your binaries really hard to run right away. With Watcher, we aimed simplicity in configuration, and tried to make it as simple as possible.
 
+Now ships with the awesome [Delve](https://github.com/go-delve/delve), debugger for Go
+
 ## Installation
 
 Get the package with:
@@ -39,6 +41,15 @@ package:
   - --argXYZ=some-value
   - --argABC=another-value
   - --argEMPTY
+delve-args:
+  - --headless
+  - --continue
+  - --accept-multiclient
+  - --api-version=2
+  - --listen=:2345
+  - --output=/tmp/__debug_bin
+  - --log
+  - --log-dest=debugger.log"
 ```
 
 ### Step-3
@@ -93,6 +104,10 @@ On Mac OS X, when you make a tls connection, you can get a message like: x509: `
 You can resolve this problem by setting CGO_ENABLED=0
 https://github.com/golang/go/issues/14514
 https://codereview.appspot.com/22020045
+
+## TODO
+
+[] Fix tests
 
 ## Author
 

@@ -4,7 +4,6 @@ package watcher
 type AppConfig struct {
 	DelveArgs []string `yaml:"delve-args,omitempty"`
 	Package   struct {
-		Path string   `yaml:"path"`
 		Args []string `yaml:"args,omitempty"`
 	} `yaml:"package"`
 	Watcher struct {

@@ -3,7 +3,7 @@ delve-args:
   - --continue
   - --accept-multiclient
   - --api-version=2
-  - --listen=:8084
+  - --listen=:2345
   - --output=/tmp/__debug_bin
   - --log
   - --log-dest=debugger.log"

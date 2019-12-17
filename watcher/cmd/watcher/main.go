@@ -27,19 +27,19 @@ func main() {
 		return
 	}
 
-	w := watcher.MustRegisterWatcher(config)
+	wtcher := watcher.MustRegisterWatcher(config)
 
-	r := watcher.NewRunner()
+	debugger := watcher.NewDebugger()
 
 	// wait for changes and run the binary with given config
-	go r.Run(config)
-	b := watcher.NewBuilder(w, r)
+	go debugger.Debug(config)
+	builder := watcher.NewBuilder(wtcher, debugger)
 
 	// build given package
-	go b.Build(config)
+	go builder.Build(config)
 
 	// listen for further changes
-	go w.Watch()
+	go wtcher.Watch()
 
-	r.Wait()
+	debugger.Wait()
 }
