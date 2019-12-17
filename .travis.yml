@@ -1,7 +1,8 @@
 language: go
 go:
-  - 1.6
-  - 1.5
+  - "1.11"
+  - "1.12"
+  - "1.13"
 env:
   - GO15VENDOREXPERIMENT=1
 

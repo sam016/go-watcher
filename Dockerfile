@@ -1,39 +1,25 @@
-FROM buildpack-deps:jessie-scm
-MAINTAINER Can Yucel "can.yucel@gmail.com"
+FROM golang:1.12
+LABEL maintainer="devmaster@sam016.com"
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-		g++ \
-		gcc \
-		libc6-dev \
-		make \
-		pkg-config \
-    bison \
-	&& rm -rf /var/lib/apt/lists/*
+RUN go get -v github.com/fatih/color
+RUN go get -v gopkg.in/fsnotify.v1
+RUN go get -v golang.org/x/sys/...
+RUN go get -v gopkg.in/yaml.v2
 
-SHELL ["/bin/bash", "-c"]
+COPY . /go/src/github.com/sam016/go-watcher
 
-ENV GO_VERSION 1.7
+ENV VERSION 1.0.0
 
-RUN curl -s -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer | bash
+RUN go get -v github.com/sam016/go-watcher/watcher/...
+RUN GOVERSION="$(go version)" go build \
+    -o $GOPATH/bin/watcher \
+    -ldflags "-X main.goversion='$GOVERSION' -X main.version=$VERSION -X main.commitID=000 -X main.buildTime=$(date +%s)" \
+    github.com/sam016/go-watcher/watcher/cmd/watcher
 
-RUN . /root/.gvm/scripts/gvm && \
-      gvm install go1.4 && \
-      gvm use go1.4 && \
-      gvm install go1.5 && \
-      gvm install go1.6 && \
-      gvm install go1.7
-
-ENV WATCHER_VERSION 0.2.4
-
-ADD https://github.com/canthefason/go-watcher/releases/download/v${WATCHER_VERSION}/watcher-${WATCHER_VERSION}-linux-amd64 /root/.gvm/bin/watcher
-
-RUN chmod +x /root/.gvm/bin/watcher
-
-ENV GOPATH /go
+RUN watcher --version
 
 WORKDIR /go/src
 
-VOLUME /go/src
 ADD entrypoint.sh /
 
 ENTRYPOINT ["/entrypoint.sh"]
