@@ -8,7 +8,7 @@ RUN go get -v gopkg.in/yaml.v2
 
 COPY . /go/src/github.com/sam016/go-watcher
 
-ENV VERSION 1.0.0
+ENV VERSION 0.12.1
 
 RUN go get -v github.com/sam016/go-watcher/watcher/...
 RUN GOVERSION="$(go version)" go build \
